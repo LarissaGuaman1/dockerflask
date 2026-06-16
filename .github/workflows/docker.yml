@@ -41,7 +41,7 @@ jobs:
     - name: Probar la ssh en el vps
       uses: appleboy/ssh-action@v1
       with:
-        host: ${{ secrets.VPS_HOST }}
+        host: ${{ secrets.VPS_HOST }}   
         username: ${{ secrets.VPS_USER }}
         password: ${{ secrets.VPS_PASSWORD }}
         port: ${{ secrets.VPS_PORT }}
