@@ -1,50 +1,32 @@
-name: Docker Build and Deploy
+name: Landing PAGE quinto A
 
 on:
-push:
-branches:
-- main
+  push:
+    branches: [ "main" ]
 
 permissions:
-contents: read
-packages: write
+  contents: read
+  packages: write
 
 jobs:
-build-and-push:
-runs-on: ubuntu-latest
+  build:
 
-steps:
-  - name: Descargar codigo
-    uses: actions/checkout@v4
+    runs-on: ubuntu-latest
 
-  - name: Login en GitHub Container Registry
-    run: echo "${{ secrets.GHCR_PATH }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-  - name: Construir y subir imagen Docker
-    uses: docker/build-push-action@v5
-    with:
-      context: .
-      push: true
-      tags: ghcr.io/larissaguaman1/dockerflask:latest
-
-deploy:
-needs: build-and-push
-runs-on: ubuntu-latest
-
-steps:
-  - name: Conectarse al servidor y desplegar
-    uses: appleboy/ssh-action@v1.0.3
-    with:
-      host: ${{ secrets.VPS_SERVER }}
-      username: ${{ secrets.VPS_USER }}
-      password: ${{ secrets.VPS_PASSWORD }}
-      port: ${{ secrets.VPS_PORT }}
-      script: |
-        docker login ghcr.io -u larissaguaman1 -p ${{ secrets.GHCR_PATH }}
-        docker pull ghcr.io/larissaguaman1/dockerflask:latest
-        docker rm -f holaflask || true
-        docker run -d \
-          --name holaflask \
-          -p 5000:5000 \
-          ghcr.io/larissaguaman1/dockerflask:latest
-
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    
+    - name: Costruir imagen de docker
+      run: docker build -t ghcr.io/byronmoreno/landingquintoa:1.0.0 .
+    
+    - name: Login en GitHub Container Registry
+      run: echo "${{ secrets.GHCR_PATH }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    
+    - name: Publicar la imagen creada
+      run: docker push ghcr.io/byronmoreno/landingquintoa:1.0.0
