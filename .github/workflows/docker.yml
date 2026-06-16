@@ -13,7 +13,8 @@ jobs:
 build-and-push:
 runs-on: ubuntu-latest
 
-
+```
+steps:
   - name: Descargar código
     uses: actions/checkout@v4
 
@@ -44,8 +45,5 @@ steps:
         docker login ghcr.io -u larissaguaman1 -p ${{ secrets.TOKEN }}
         docker pull ghcr.io/larissaguaman1/dockerflask:1.0.0
         docker rm -f holaflask || true
-        docker run -d \
-          --name holaflask \
-          -p 5000:5000 \
-          ghcr.io/larissaguaman1/dockerflask:1.0.0
+        docker run -d --name holaflask -p 5000:5000 ghcr.io/larissaguaman1/dockerflask:1.0.0
 ```
