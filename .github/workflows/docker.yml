@@ -1,14 +1,60 @@
-- name: Probar SSH en el VPS
-  uses: appleboy/ssh-action@v1.0.3
-  with:
-    host: ${{ secrets.VPS_HOST }}
-    username: ${{ secrets.VPS_USER }}
-    password: ${{ secrets.VPS_PASSWORD }}
-    port: ${{ secrets.VPS_PORT }}
-    timeout: 60s
-    script: |
-      echo "Conexión SSH correcta"
-      hostname
-      whoami
-      pwd
-      docker --version
+name: Landing PAGE quinto A
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Login en GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Construir imagen de Docker
+        run: docker build -t ghcr.io/larissaguaman1/landingquintoa:1.0.0 .
+
+      - name: Publicar la imagen creada
+        run: docker push ghcr.io/larissaguaman1/landingquintoa:1.0.0
+
+      - name: Mostrar variables no sensibles
+        run: |
+          echo "Probando conexión SSH con:"
+          echo "Host: ${{ secrets.VPS_HOST }}"
+          echo "Usuario: ${{ secrets.VPS_USER }}"
+          echo "Puerto: ${{ secrets.VPS_PORT }}"
+
+      - name: Probar SSH en el VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            echo "Conexión SSH correcta"
+            hostname
+            whoami
+            pwd
+            docker --version
+            
