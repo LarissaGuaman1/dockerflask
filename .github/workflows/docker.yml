@@ -1,4 +1,4 @@
-name: Flask Docker Deploy
+name: Docker Build and Deploy
 
 on:
 push:
@@ -15,17 +15,18 @@ runs-on: ubuntu-latest
 
 ```
 steps:
-  - name: Descargar código
+  - name: Descargar codigo
     uses: actions/checkout@v4
 
   - name: Login en GitHub Container Registry
-    run: echo "${{ secrets.TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    run: echo "${{ secrets.GHCR_PATH }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-  - name: Construir imagen Docker
-    run: docker build -t ghcr.io/larissaguaman1/dockerflask:1.0.0 .
-
-  - name: Publicar imagen en GHCR
-    run: docker push ghcr.io/larissaguaman1/dockerflask:1.0.0
+  - name: Construir y subir imagen Docker
+    uses: docker/build-push-action@v5
+    with:
+      context: .
+      push: true
+      tags: ghcr.io/larissaguaman1/dockerflask:latest
 ```
 
 deploy:
@@ -42,8 +43,11 @@ steps:
       password: ${{ secrets.VPS_PASSWORD }}
       port: ${{ secrets.VPS_PORT }}
       script: |
-        docker login ghcr.io -u larissaguaman1 -p ${{ secrets.TOKEN }}
-        docker pull ghcr.io/larissaguaman1/dockerflask:1.0.0
+        docker login ghcr.io -u larissaguaman1 -p ${{ secrets.GHCR_PATH }}
+        docker pull ghcr.io/larissaguaman1/dockerflask:latest
         docker rm -f holaflask || true
-        docker run -d --name holaflask -p 5000:5000 ghcr.io/larissaguaman1/dockerflask:1.0.0
+        docker run -d \
+          --name holaflask \
+          -p 5000:5000 \
+          ghcr.io/larissaguaman1/dockerflask:latest
 ```
