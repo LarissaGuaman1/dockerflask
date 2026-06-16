@@ -46,8 +46,7 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         port: ${{ secrets.VPS_PORT }}
         script: |
-          echo "Probando conexion ssh"
+          echo "Probando conexion  ssh"
           hostname
           whoami
           update
-          
