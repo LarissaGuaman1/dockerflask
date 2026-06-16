@@ -10,43 +10,50 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.11"
-    - name: Install dependencies
-      run: pip install -r requirements.txt
-    
-    - name: Costruir imagen de docker
-      run: docker build -t ghcr.io/larissaguaman1/landingquintoa:1.0.0 .
-    
-    - name: Login en GitHub Container Registry
-      run: echo "${{ secrets.GHCR_TOKEN}}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-    
-    - name: Publicar la imagen creada
-      run: docker push ghcr.io/larissaguaman1/landingquintoa:1.0.0
-    - name: mostrar variables (solo locales, no secrets)
-      run: |
-        echo "Provando conexion SSH con:"
-        echo "Host: ${{ secrets.VPS_HOST }}"
-        echo "Usuario: ${{ secrets.VPS_USER }}"
-        echo "Puerto: ${{ secrets.VPS_PORT }}"
-        echo "Password: ${{ secrets.VPS_PASSWORD }}"
+      - name: Descargar código
+        uses: actions/checkout@v4
 
-    - name: Probar la ssh en el vps
-      uses: appleboy/ssh-action@v1
-      with:
-        host: ${{ secrets.VPS_HOST }}   
-        username: ${{ secrets.VPS_USER }}
-        password: ${{ secrets.VPS_PASSWORD }}
-        port: ${{ secrets.VPS_PORT }}
-        script: |
-          echo "Probando conexion  ssh"
-          hostname
-          whoami
-          update
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Login en GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construir imagen de Docker
+        run: docker build -t ghcr.io/larissaguaman1/landingquintoa:1.0.0 .
+
+      - name: Publicar la imagen creada
+        run: docker push ghcr.io/larissaguaman1/landingquintoa:1.0.0
+
+      - name: Mostrar variables no sensibles
+        run: |
+          echo "Probando conexión SSH con:"
+          echo "Host: ${{ secrets.VPS_HOST }}"
+          echo "Usuario: ${{ secrets.VPS_USER }}"
+          echo "Puerto: ${{ secrets.VPS_PORT }}"
+
+      - name: Probar SSH en el VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            echo "Conexión SSH correcta"
+            hostname
+            whoami
+            pwd
+            docker --version
