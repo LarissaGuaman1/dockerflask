@@ -53,8 +53,5 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             echo "Conexión SSH correcta"
-            hostname
-            whoami
-            pwd
-            docker --version
+            touch quintoa.txt
             
