@@ -83,3 +83,4 @@ jobs:
 
             echo "==> Desplegando stack..."
             docker stack deploy -c stack.yml borrar
+            
