@@ -62,17 +62,24 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
-          source: "stack.yml, Makefile"
+          source: "stack.yml,Makefile"
           target: "/home/${{ secrets.VPS_USER }}/landinga"
 
-        # Paso 1 descagar la imagen 
-        #echo "==> descargando la imagen del GHCR"
-        echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/larissaguaman1/dockerflask:latest
+      - name: Desplegar stack en el VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            cd /home/${{ secrets.VPS_USER }}/landinga
 
-        #Paso 3 de
-        echo "==> Desplegando stack..."
-        docker stack deploy -c stack.yml borrar
+            echo "==> Iniciando sesión en GHCR"
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-               
-            
+            echo "==> Descargando la imagen del GHCR"
+            docker pull ghcr.io/larissaguaman1/landingquintoa:1.0.0
+
+            echo "==> Desplegando stack..."
+            docker stack deploy -c stack.yml borrar
