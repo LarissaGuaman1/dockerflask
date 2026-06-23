@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   larissag:
-    image: ghcr.io/larissaguaman1/larissag:1.0.0
+    image: ghcr.io/larissaguaman1/landingquintoa:1.0.0
     build:
       context: .
       dockerfile: Dockerfile
