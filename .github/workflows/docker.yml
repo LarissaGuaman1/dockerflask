@@ -64,5 +64,15 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           source: "stack.yml, Makefile"
           target: "/home/${{ secrets.VPS_USER }}/landinga"
+
+        # Paso 1 descagar la imagen 
+        #echo "==> descargando la imagen del GHCR"
+        echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/larissaguaman1/dockerflask:latest
+
+        #Paso 3 de
+        echo "==> Desplegando stack..."
+        docker stack deploy -c stack.yml borrar
+
                
             
