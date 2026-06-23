@@ -17,7 +17,7 @@ services:
 
         # HTTP
         - "traefik.http.routers.larissag.rule=Host(`larissag.byronrm.com`)"
-        - "traefik.http.routers.larissag.entrypoints=web"
+        - "traefik.http.routers.larissag.entrypoints=http"
         - "traefik.http.routers.larissag.middlewares=larissag-https-redirect"
 
         # Redirección a HTTPS
@@ -25,7 +25,7 @@ services:
 
         # HTTPS
         - "traefik.http.routers.larissag-secure.rule=Host(`larissag.byronrm.com`)"
-        - "traefik.http.routers.larissag-secure.entrypoints=websecure"
+        - "traefik.http.routers.larissag-secure.entrypoints=https"
         - "traefik.http.routers.larissag-secure.tls=true"
         - "traefik.http.routers.larissag-secure.tls.certresolver=http"
         - "traefik.http.routers.larissag-secure.service=larissag"
