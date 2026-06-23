@@ -3,9 +3,6 @@ version: '3.8'
 services:
   larissag:
     image: ghcr.io/larissaguaman1/landingquintoa:1.0.0
-    build:
-      context: .
-      dockerfile: Dockerfile
     networks:
       - traefik-public
     deploy:
@@ -17,16 +14,26 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.larissag.entrypoints=http"
+
+        # HTTP
         - "traefik.http.routers.larissag.rule=Host(`larissag.byronrm.com`)"
-        - "traefik.http.middlewares.larissag-https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.routers.larissag.entrypoints=web"
         - "traefik.http.routers.larissag.middlewares=larissag-https-redirect"
-        - "traefik.http.routers.larissag-secure.entrypoints=https"
+
+        # Redirección a HTTPS
+        - "traefik.http.middlewares.larissag-https-redirect.redirectscheme.scheme=https"
+
+        # HTTPS
         - "traefik.http.routers.larissag-secure.rule=Host(`larissag.byronrm.com`)"
+        - "traefik.http.routers.larissag-secure.entrypoints=websecure"
         - "traefik.http.routers.larissag-secure.tls=true"
         - "traefik.http.routers.larissag-secure.tls.certresolver=http"
         - "traefik.http.routers.larissag-secure.service=larissag"
+
+        # Puerto interno de Flask
         - "traefik.http.services.larissag.loadbalancer.server.port=5000"
+
+        # Red de Traefik
         - "traefik.docker.network=traefik-public"
 
 networks:
